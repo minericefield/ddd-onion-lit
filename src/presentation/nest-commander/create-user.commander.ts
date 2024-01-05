@@ -3,6 +3,9 @@ import { Command, CommandRunner } from 'nest-commander';
 
 import { CreateUserUseCase } from '../../application/user/create-user.usecase';
 
+/**
+ * yarn start:commander CreateUser Charlie example@example.com
+ */
 @Command({
   name: 'CreateUser',
   description: 'Create user by name and email address.',
