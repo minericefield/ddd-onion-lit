@@ -18,6 +18,7 @@ TODO
 ```
 docker compose up -d
 ```
+Mapped port is 3306.
 
 ##### Install dependencies.
 ```
