@@ -1,4 +1,5 @@
 import { User } from '../../domain/user/user.aggregate-root';
+
 export class FindUsersUseCaseResponseDto {
   readonly users: {
     id: string;
