@@ -32,7 +32,7 @@ export class TaskTypeormRepository implements TaskRepository {
         taskId: task.id.value,
         userId: task.userId.value,
       },
-      taskComments: task.comments.value.map((comment) => ({
+      taskComments: task.comments.map((comment) => ({
         id: comment.id.value,
         userId: comment.userId.value,
         content: comment.content,
@@ -53,7 +53,7 @@ export class TaskTypeormRepository implements TaskRepository {
 
     await this.taskCommentRepository.delete({ taskId: task.id.value });
     await this.taskCommentRepository.save(
-      task.comments.value.map((comment) => ({
+      task.comments.map((comment) => ({
         id: comment.id.value,
         userId: comment.userId.value,
         content: comment.content,

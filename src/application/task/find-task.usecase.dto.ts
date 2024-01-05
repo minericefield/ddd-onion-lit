@@ -31,7 +31,7 @@ export class FindTaskUseCaseResponseDto {
     this.task = {
       id: task.id.value,
       name: task.name.value,
-      comments: task.comments.value.map((comment) => ({
+      comments: task.comments.map((comment) => ({
         id: comment.id.value,
         userId: comment.userId.value,
         content: comment.content,

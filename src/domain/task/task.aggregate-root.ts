@@ -14,7 +14,7 @@ export class Task {
   ) {}
 
   get comments() {
-    return this._comments;
+    return this._comments.value;
   }
 
   get userId() {
