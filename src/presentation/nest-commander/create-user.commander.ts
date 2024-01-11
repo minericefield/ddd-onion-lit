@@ -18,10 +18,14 @@ export class CreateUserCommander extends CommandRunner {
   async run(nameAndEmailAddress: string[]) {
     const [name, emailAddress] = nameAndEmailAddress;
 
-    const { id } = await this.createUserUseCase.handle({
-      name,
-      emailAddress,
-    });
-    Logger.log(`User successfully created. id: ${id}`);
+    try {
+      const { id } = await this.createUserUseCase.handle({
+        name,
+        emailAddress,
+      });
+      Logger.log(`User successfully created. id: ${id}`);
+    } catch (error: unknown) {
+      Logger.error(error);
+    }
   }
 }
