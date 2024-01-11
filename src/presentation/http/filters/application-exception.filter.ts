@@ -51,7 +51,7 @@ export class UnexpectedApplicationExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
 
-    Logger.error(exception);
+    Logger.error(exception.message, exception.stack, exception.cause);
 
     response
       .status(statusCode)

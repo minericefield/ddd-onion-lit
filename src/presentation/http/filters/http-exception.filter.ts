@@ -28,7 +28,7 @@ export class InternalServerErrorExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const statusCode = exception.getStatus();
 
-    Logger.error(exception);
+    Logger.error(exception.message, exception.stack, exception.cause);
 
     response
       .status(statusCode)

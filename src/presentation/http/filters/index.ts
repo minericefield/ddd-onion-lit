@@ -11,9 +11,11 @@ import {
   HttpExceptionFilter,
   InternalServerErrorExceptionFilter,
 } from './http-exception.filter';
+import { NativeErrorExceptionFilter } from './native-error-exception.filter';
 
 export default [
   AllExceptionFilter,
+  NativeErrorExceptionFilter,
   HttpExceptionFilter,
   InternalServerErrorExceptionFilter,
   UnexpectedApplicationExceptionFilter,
