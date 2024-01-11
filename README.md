@@ -36,3 +36,6 @@ Check it out at [localhost:3000/swagger](http://localhost:3000/swagger) .
 yarn start:commander SeedUser
 ```
 You can login by `test@example.com` .
+
+# Other implementation approaches
+- [Generate the aggregate root from the factory](https://github.com/minericefield/ddd-onion-lit/tree/variations/user-factory)
