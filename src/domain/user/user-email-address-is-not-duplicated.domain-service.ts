@@ -12,6 +12,9 @@ import { UserRepository } from './user.repository';
 export class UserEmailAddressIsNotDuplicated {
   constructor(private readonly userRepository: UserRepository) {}
 
+  /**
+   * @throws {DuplicatedUserEmailAddressException}
+   */
   async handle(userEmailAddress: UserEmailAddress) {
     if (await this.userRepository.findOneByEmailAddress(userEmailAddress)) {
       throw new DuplicatedUserEmailAddressException();
