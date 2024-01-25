@@ -25,7 +25,7 @@ export class Task {
     return new Task(id, name, new Comments([]));
   }
 
-  static reconstruct(
+  static reconstitute(
     id: TaskId,
     name: TaskName,
     comments: Comment[],

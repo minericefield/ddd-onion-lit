@@ -71,7 +71,7 @@ export class TaskTypeormRepository implements TaskRepository {
       },
     });
     return tasks.map((task) =>
-      Task.reconstruct(
+      Task.reconstitute(
         new TaskId(task.id),
         new TaskName(task.name),
         task.taskComments.map(
@@ -98,7 +98,7 @@ export class TaskTypeormRepository implements TaskRepository {
     });
     return (
       task &&
-      Task.reconstruct(
+      Task.reconstitute(
         new TaskId(task.id),
         new TaskName(task.name),
         task.taskComments.map(
