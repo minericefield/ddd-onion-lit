@@ -3,6 +3,7 @@ import { ConfigService, ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
+import factories from './factories';
 import models from './models';
 import { SnakeNamingAndPluralTableNameStrategy } from './naming-strategies/snake-naming-and-plural-table-name';
 import queryServices from './query-services';
@@ -34,7 +35,7 @@ import transactors from './transactors';
     }),
     TypeOrmModule.forFeature([...models]),
   ],
-  providers: [...repositories, ...queryServices, ...transactors],
-  exports: [...repositories, ...queryServices, ...transactors],
+  providers: [...repositories, ...factories, ...queryServices, ...transactors],
+  exports: [...repositories, ...factories, ...queryServices, ...transactors],
 })
 export class TypeormModule {}

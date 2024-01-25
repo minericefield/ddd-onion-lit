@@ -2,42 +2,15 @@
 
 Implementing onion architecture.
 
-# Concept
+## Generate the aggregate root from the factory
 
-- [[DDD] Tactical Design Patterns Part 1: Domain Layer](https://dev.to/minericefield/ddd-tactical-design-patterns-part-1-domain-layer-j38)
-- [[DDD] Tactical Design Patterns Part 2: Application Layer](https://dev.to/minericefield/ddd-tactical-design-patterns-part-2-application-layer-e14)
-- [[DDD] Tactical Design Patterns Part 3: Presentation/Infrastructure Layer](https://dev.to/minericefield/ddd-tactical-design-patterns-part-3-presentationinfrastructure-layer-2e4f)
+In this branch, as an alternative implementation approach, the user aggregate root is generated through the factory.
 
-# use case model
-![](doc/use%20case%20model.png)
+This pattern offers several advantages:
 
-# domain model
-![](doc/domain%20model.png)
+- The client (mainly application services) can delegate the enforcement of invariants related to generation to the factory.
+- The client does not need to be familiar with the internal structure of the aggregate root.
+- The client does not have to generate or hold objects inside the boundary.
 
-# Development
-
-##### For mysql.
-```
-docker compose up -d
-```
-Mapped port is 3306.
-
-##### Install dependencies.
-```
-yarn install
-```
-
-##### Launch app.
-```
-yarn start:dev
-```
-Check it out at [localhost:3000/swagger](http://localhost:3000/swagger) .
-
-##### If you want to create example users.
-```
-yarn start:commander SeedUser
-```
-You can login by `test@example.com` .
-
-# Other implementation approaches
-- [Generate the aggregate root from the factory](https://github.com/minericefield/ddd-onion-lit/tree/variations/user-factory)
+On the other hand, the construction of the user aggregate root is not complicated, and all of its properties are exposed.
+In such cases, there is an argument that implementing a factory might be considered excessive.

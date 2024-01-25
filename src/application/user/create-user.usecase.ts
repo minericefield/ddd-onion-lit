@@ -1,9 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-import { UserEmailAddressIsNotDuplicated } from '../../domain/user/user-email-address-is-not-duplicated.domain-service';
-import { UserEmailAddress } from '../../domain/user/user-email-address.value-object';
-import { UserIdFactory } from '../../domain/user/user-id.value-object';
-import { User } from '../../domain/user/user.aggregate-root';
+import { UserFactory } from '../../domain/user/user.aggregate-root.factory';
 import { UserRepository } from '../../domain/user/user.repository';
 
 import {
@@ -15,8 +12,7 @@ import {
 export class CreateUserUseCase {
   constructor(
     private readonly userRepository: UserRepository,
-    private readonly userIdFactory: UserIdFactory,
-    private readonly userEmailAddressIsNotDuplicated: UserEmailAddressIsNotDuplicated,
+    private readonly userFactory: UserFactory,
   ) {}
 
   /**
@@ -27,18 +23,11 @@ export class CreateUserUseCase {
     requestDto: CreateUserUseCaseRequestDto,
   ): Promise<CreateUserUseCaseResponseDto> {
     /**
-     * Create userEmailAddress.
-     */
-    const userEmailAddress = new UserEmailAddress(requestDto.emailAddress);
-    await this.userEmailAddressIsNotDuplicated.handle(userEmailAddress);
-
-    /**
      * Create user.
      */
-    const user = new User(
-      await this.userIdFactory.handle(),
+    const user = await this.userFactory.handle(
       requestDto.name,
-      userEmailAddress,
+      requestDto.emailAddress,
     );
 
     /**
