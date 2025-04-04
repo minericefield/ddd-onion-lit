@@ -3,10 +3,10 @@ import {
   Catch,
   ArgumentsHost,
   HttpStatus,
-  Logger,
 } from '@nestjs/common';
 import { Response } from 'express';
 
+import { Logger } from '../../../application/shared/logger';
 import {
   ValidationDomainException,
   UnexpectedDomainException,
@@ -27,15 +27,23 @@ export class ValidationDomainExceptionFilter implements ExceptionFilter {
 
 @Catch(UnexpectedDomainException)
 export class UnexpectedDomainExceptionFilter implements ExceptionFilter {
+  constructor(private readonly logger: Logger) {}
+
   catch(exception: UnexpectedDomainException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
 
-    Logger.error(exception.message, exception.stack, exception.cause);
+    this.logger.error(
+      JSON.stringify({
+        message: exception.message,
+        stack: exception.stack,
+        cause: exception.cause,
+      }),
+    );
 
     response
       .status(statusCode)
-      .json({ statusCode, message: 'An unexpected error ocurred.' });
+      .json({ statusCode, message: 'An unexpected error occurred.' });
   }
 }
