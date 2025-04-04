@@ -1,10 +1,12 @@
 import { Injectable } from '@nestjs/common';
 
+import { DomainEventPublisher } from '../../domain/shared/domain-event-publisher';
 import { UserEmailAddressIsNotDuplicated } from '../../domain/user/user-email-address-is-not-duplicated.domain-service';
 import { UserEmailAddress } from '../../domain/user/user-email-address.value-object';
 import { UserIdFactory } from '../../domain/user/user-id.value-object';
 import { User } from '../../domain/user/user.aggregate-root';
 import { UserRepository } from '../../domain/user/user.repository';
+import { RepositoryTransactor } from '../shared/repository-transactor.';
 
 import {
   CreateUserUseCaseRequestDto,
@@ -17,6 +19,8 @@ export class CreateUserUseCase {
     private readonly userRepository: UserRepository,
     private readonly userIdFactory: UserIdFactory,
     private readonly userEmailAddressIsNotDuplicated: UserEmailAddressIsNotDuplicated,
+    private readonly repositoryTransactor: RepositoryTransactor,
+    private readonly domainEventPublisher: DomainEventPublisher,
   ) {}
 
   /**
@@ -26,26 +30,33 @@ export class CreateUserUseCase {
   async handle(
     requestDto: CreateUserUseCaseRequestDto,
   ): Promise<CreateUserUseCaseResponseDto> {
-    /**
-     * Create userEmailAddress.
-     */
-    const userEmailAddress = new UserEmailAddress(requestDto.emailAddress);
-    await this.userEmailAddressIsNotDuplicated.handle(userEmailAddress);
+    return this.repositoryTransactor.handle(async () => {
+      /**
+       * Create userEmailAddress.
+       */
+      const userEmailAddress = new UserEmailAddress(requestDto.emailAddress);
+      await this.userEmailAddressIsNotDuplicated.handle(userEmailAddress);
 
-    /**
-     * Create user.
-     */
-    const user = new User(
-      await this.userIdFactory.handle(),
-      requestDto.name,
-      userEmailAddress,
-    );
+      /**
+       * Create user.
+       */
+      const user = User.create(
+        await this.userIdFactory.handle(),
+        requestDto.name,
+        userEmailAddress,
+      );
 
-    /**
-     * Store it.
-     */
-    await this.userRepository.insert(user);
+      /**
+       * Store it.
+       */
+      await this.userRepository.insert(user);
 
-    return new CreateUserUseCaseResponseDto(user);
+      /**
+       * Publish domain events.
+       */
+      this.domainEventPublisher.handle(...user.events);
+
+      return new CreateUserUseCaseResponseDto(user);
+    });
   }
 }
