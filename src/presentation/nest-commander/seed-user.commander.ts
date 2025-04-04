@@ -1,10 +1,10 @@
-import { Logger } from '@nestjs/common';
 import { Command, CommandRunner } from 'nest-commander';
 
 import { CreateUserUseCase } from '../../application/user/create-user.usecase';
 
 /**
  * Seeder should be defined in different resources(e.g., belonging to database or orm).
+ * It actually shouldn't call use case.
  */
 @Command({
   name: 'SeedUser',
@@ -22,19 +22,23 @@ export class SeedUserCommander extends CommandRunner {
     },
   ];
 
-  constructor(private readonly createUserUseCase: CreateUserUseCase) {
+  constructor(
+    private readonly createUserUseCase: CreateUserUseCase,
+    private readonly proxy: (run: () => Promise<void>) => Promise<void>,
+  ) {
     super();
   }
 
   async run() {
-    await Promise.all([
-      ...SeedUserCommander.USERS.map(({ name, emailAddress }) =>
-        this.createUserUseCase.handle({
-          name,
-          emailAddress,
-        }),
-      ),
-    ]);
-    Logger.log('Seeder successfully completed.');
+    await this.proxy(async () => {
+      await Promise.all([
+        ...SeedUserCommander.USERS.map(({ name, emailAddress }) =>
+          this.createUserUseCase.handle({
+            name,
+            emailAddress,
+          }),
+        ),
+      ]);
+    });
   }
 }
