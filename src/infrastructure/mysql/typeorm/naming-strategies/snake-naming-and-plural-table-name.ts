@@ -7,7 +7,7 @@ import { plural } from 'pluralize';
 import { DefaultNamingStrategy, NamingStrategyInterface } from 'typeorm';
 import { snakeCase } from 'typeorm/util/StringUtils';
 
-export class SnakeNamingAndPluralTableNameStrategy
+export default class SnakeNamingAndPluralTableNameStrategy
   extends DefaultNamingStrategy
   implements NamingStrategyInterface
 {

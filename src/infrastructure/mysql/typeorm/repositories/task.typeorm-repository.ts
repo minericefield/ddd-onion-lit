@@ -1,6 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 
 import { CommentId } from '../../../../domain/task/comment/comment-id.value-object';
 import { Comment } from '../../../../domain/task/comment/comment.entity';
@@ -9,23 +7,18 @@ import { TaskName } from '../../../../domain/task/task-name.value-object';
 import { Task } from '../../../../domain/task/task.aggregate-root';
 import { TaskRepository } from '../../../../domain/task/task.repository';
 import { UserId } from '../../../../domain/user/user-id.value-object';
-import { Task as TaskTypeormModel } from '../models/task';
-import { TaskAssignment as TaskAssignmentTypeormModel } from '../models/task-assignment';
-import { TaskComment as TaskCommentTypeormModel } from '../models/task-comment';
+import models from '../models';
+
+import GetTypeormRepositories from './shared/get-typeorm-repositories';
 
 @Injectable()
 export class TaskTypeormRepository implements TaskRepository {
-  constructor(
-    @InjectRepository(TaskTypeormModel)
-    private readonly taskRepository: Repository<TaskTypeormModel>,
-    @InjectRepository(TaskAssignmentTypeormModel)
-    private readonly taskAssignmentRepository: Repository<TaskAssignmentTypeormModel>,
-    @InjectRepository(TaskCommentTypeormModel)
-    private readonly taskCommentRepository: Repository<TaskCommentTypeormModel>,
-  ) {}
+  constructor(private readonly getRepositories: GetTypeormRepositories) {}
 
   async insert(task: Task) {
-    await this.taskRepository.save({
+    const [taskRepository] = this.getRepositories.handle(models.Task);
+
+    await taskRepository.save({
       id: task.id.value,
       name: task.name.value,
       taskAssignment: task.userId && {
@@ -41,18 +34,46 @@ export class TaskTypeormRepository implements TaskRepository {
     });
   }
 
-  async update(task: Task) {
-    await this.taskRepository.update(task.id.value, { name: task.name.value });
+  async insertMany(tasks: Task[]) {
+    const [taskRepository] = this.getRepositories.handle(models.Task);
 
-    await this.taskAssignmentRepository.delete({ taskId: task.id.value });
+    await taskRepository.save(
+      tasks.map((task) => ({
+        id: task.id.value,
+        name: task.name.value,
+        taskAssignment: task.userId && {
+          taskId: task.id.value,
+          userId: task.userId.value,
+        },
+        taskComments: task.comments.map((comment) => ({
+          id: comment.id.value,
+          userId: comment.userId.value,
+          content: comment.content,
+          postedAt: comment.postedAt,
+        })),
+      })),
+    );
+  }
+
+  async update(task: Task) {
+    const [taskRepository, taskAssignmentRepository, taskCommentRepository] =
+      this.getRepositories.handle(
+        models.Task,
+        models.TaskAssignment,
+        models.TaskComment,
+      );
+
+    await taskRepository.update(task.id.value, { name: task.name.value });
+
+    await taskAssignmentRepository.delete({ taskId: task.id.value });
     task.userId &&
-      (await this.taskAssignmentRepository.save({
+      (await taskAssignmentRepository.save({
         taskId: task.id.value,
         userId: task.userId.value,
       }));
 
-    await this.taskCommentRepository.delete({ taskId: task.id.value });
-    await this.taskCommentRepository.save(
+    await taskCommentRepository.delete({ taskId: task.id.value });
+    await taskCommentRepository.save(
       task.comments.map((comment) => ({
         id: comment.id.value,
         userId: comment.userId.value,
@@ -64,7 +85,8 @@ export class TaskTypeormRepository implements TaskRepository {
   }
 
   async find() {
-    const tasks = await this.taskRepository.find({
+    const [taskRepository] = this.getRepositories.handle(models.Task);
+    const tasks = await taskRepository.find({
       relations: {
         taskAssignment: true,
         taskComments: true,
@@ -89,7 +111,8 @@ export class TaskTypeormRepository implements TaskRepository {
   }
 
   async findOneById(id: TaskId) {
-    const task = await this.taskRepository.findOne({
+    const [taskRepository] = this.getRepositories.handle(models.Task);
+    const task = await taskRepository.findOne({
       where: { id: id.value },
       relations: {
         taskAssignment: true,

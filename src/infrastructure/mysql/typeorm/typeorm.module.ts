@@ -4,9 +4,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
 import models from './models';
-import { SnakeNamingAndPluralTableNameStrategy } from './naming-strategies/snake-naming-and-plural-table-name';
+import SnakeNamingAndPluralTableNameStrategy from './naming-strategies/snake-naming-and-plural-table-name';
 import queryServices from './query-services';
 import repositories from './repositories';
+import GetRepositories from './repositories/shared/get-typeorm-repositories';
 import transactors from './transactors';
 
 /**
@@ -25,16 +26,21 @@ import transactors from './transactors';
         username: configService.get('DATABASE_USERNAME'),
         password: configService.get('DATABASE_PASSWORD'),
         database: configService.get('DATABASE'),
-        entities: [...models],
+        entities: [...Object.values(models)],
         logging: true,
         synchronize: true, // !!! Not recommended for production. Better to use other controllable migration tool.
         namingStrategy: new SnakeNamingAndPluralTableNameStrategy(),
       }),
       dataSourceFactory: (options) => new DataSource(options).initialize(),
     }),
-    TypeOrmModule.forFeature([...models]),
+    TypeOrmModule.forFeature([...Object.values(models)]),
   ],
-  providers: [...repositories, ...queryServices, ...transactors],
+  providers: [
+    GetRepositories,
+    ...repositories,
+    ...queryServices,
+    ...transactors,
+  ],
   exports: [...repositories, ...queryServices, ...transactors],
 })
 export class TypeormModule {}
