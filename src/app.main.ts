@@ -1,9 +1,15 @@
-import { BadRequestException, Logger, ValidationPipe } from '@nestjs/common';
+import {
+  BadRequestException,
+  ValidationPipe,
+  Logger as _Logger,
+} from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
 
 import { AppModule } from './app.module';
+import { Logger } from './application/shared/logger';
+import { HttpLoggingInterceptor } from './presentation/http/interceptors/http-logging.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -22,6 +28,7 @@ async function bootstrap() {
       },
     }),
   );
+  app.useGlobalInterceptors(new HttpLoggingInterceptor(app.get(Logger)));
 
   const config = new DocumentBuilder()
     .setTitle('ddd-onion-lit')
@@ -33,6 +40,6 @@ async function bootstrap() {
   SwaggerModule.setup('swagger', app, document);
 
   await app.listen(3000);
-  Logger.debug('Check it out at localhost:3000/swagger !');
+  _Logger.debug('Check it out at localhost:3000/swagger !');
 }
 bootstrap();
