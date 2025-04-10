@@ -7,6 +7,7 @@ Implementing onion architecture.
 - [[DDD] Tactical Design Patterns Part 1: Domain Layer](https://dev.to/minericefield/ddd-tactical-design-patterns-part-1-domain-layer-j38)
 - [[DDD] Tactical Design Patterns Part 2: Application Layer](https://dev.to/minericefield/ddd-tactical-design-patterns-part-2-application-layer-e14)
 - [[DDD] Tactical Design Patterns Part 3: Presentation/Infrastructure Layer](https://dev.to/minericefield/ddd-tactical-design-patterns-part-3-presentationinfrastructure-layer-2e4f)
+- [[DDD] Tactical Design Patterns Part 4: Consistency](https://dev.to/minericefield/ddd-tactical-design-patterns-part-4-consistency-2fd8)
 
 # use case model
 ![](doc/use%20case%20model.png)
